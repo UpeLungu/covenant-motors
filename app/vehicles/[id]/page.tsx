@@ -1,0 +1,13 @@
+"use client";
+import Link from "next/link";
+import { useEffect,useState } from "react";
+import { useParams } from "next/navigation";
+import { loadVehicles } from "@/lib/vehicle-store";
+import { Vehicle } from "@/lib/types";
+const money=(n:number)=>new Intl.NumberFormat("en-ZM",{style:"currency",currency:"ZMW",maximumFractionDigits:0}).format(n);
+export default function VehicleDetailsPage(){
+ const params=useParams<{id:string}>();const [vehicle,setVehicle]=useState<Vehicle|null>(null);
+ useEffect(()=>setVehicle(loadVehicles().find(v=>v.id===params.id)||null),[params.id]);
+ if(!vehicle)return <div className="panel"><div className="empty">Vehicle not found. <Link href="/vehicles"><b>Return to vehicle stock</b></Link></div></div>;
+ return <><div className="topbar"><div className="title"><h1>{vehicle.stockId}</h1><p>{vehicle.make} {vehicle.model} {vehicle.year} · {vehicle.vin}</p></div><Link className="button secondary" href="/vehicles">Back to Vehicles</Link></div><section className="panel"><div className="panel-head"><h2>Vehicle Profile</h2><span className={`badge ${vehicle.status==="Available"?"available":vehicle.status==="In Transit"?"transit":vehicle.status==="Sold"?"sold":"awaiting"}`}>{vehicle.status}</span></div><div className="panel-body"><div className="summary-grid"><div className="summary-item"><span>Purchase Price</span><strong>{money(vehicle.purchasePrice)}</strong></div><div className="summary-item"><span>Total Vehicle Cost</span><strong>{money(vehicle.totalCost)}</strong></div><div className="summary-item"><span>Additional Costs</span><strong>{money(vehicle.totalCost-vehicle.purchasePrice)}</strong></div><div className="summary-item"><span>Supplier</span><strong>{vehicle.supplier}</strong></div><div className="summary-item"><span>Current Location</span><strong>{vehicle.currentLocation}</strong></div><div className="summary-item"><span>Purchase Date</span><strong>{vehicle.purchaseDate}</strong></div><div className="summary-item"><span>Engine Number</span><strong>{vehicle.engineNumber}</strong></div><div className="summary-item"><span>Registration</span><strong>{vehicle.registrationNumber||"Not registered"}</strong></div><div className="summary-item"><span>Colour</span><strong>{vehicle.colour||"Not captured"}</strong></div></div></div></section><section className="panel" style={{marginTop:18}}><div className="panel-head"><h2>Vehicle Timeline</h2></div><div className="panel-body"><div className="summary-item"><span>{new Date(vehicle.createdAt).toLocaleString("en-ZM")}</span><strong>Vehicle registered as {vehicle.stockId}</strong></div></div></section></>;
+}
