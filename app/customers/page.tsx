@@ -1,0 +1,14 @@
+"use client";
+import {FormEvent,useEffect,useMemo,useState} from "react";
+import {Plus,Search,Users} from "lucide-react";
+import {Customer,loadCustomers,nextCustomerId,saveCustomers} from "@/lib/customer-store";
+
+export default function CustomersPage(){
+  const [items,setItems]=useState<Customer[]>([]);const [show,setShow]=useState(false);const [q,setQ]=useState("");
+  useEffect(()=>setItems(loadCustomers()),[]);
+  const filtered=useMemo(()=>items.filter(x=>`${x.customerId} ${x.name} ${x.phone} ${x.nrcOrTpin}`.toLowerCase().includes(q.toLowerCase())),[items,q]);
+  function submit(e:FormEvent<HTMLFormElement>){e.preventDefault();const f=new FormData(e.currentTarget);const next:Customer={id:crypto.randomUUID(),customerId:nextCustomerId(items),name:String(f.get("name")),phone:String(f.get("phone")),nrcOrTpin:String(f.get("nrcOrTpin")),address:String(f.get("address")),createdAt:new Date().toISOString()};const all=[next,...items];saveCustomers(all);setItems(all);setShow(false);}
+  return <><div className="topbar"><div className="title"><h1>Customers</h1><p>Manage buyers, contact details and purchase history.</p></div><button className="button" onClick={()=>setShow(!show)}><Plus size={18}/><span>Add Customer</span></button></div>
+  {show&&<form className="form-card" onSubmit={submit}><div className="form-grid"><div className="field"><label>Full name</label><input className="input" name="name" required/></div><div className="field"><label>Phone</label><input className="input" name="phone" required/></div><div className="field"><label>NRC / TPIN</label><input className="input" name="nrcOrTpin" required/></div><div className="field"><label>Address</label><input className="input" name="address" required/></div></div><div className="actions"><button type="button" className="button secondary" onClick={()=>setShow(false)}>Cancel</button><button className="button">Save Customer</button></div></form>}
+  <div className="panel" style={{marginTop:18}}><div className="panel-head"><h2>Customer Register</h2><span className="badge available">{items.length} customers</span></div><div className="panel-body"><div className="toolbar"><div className="search-box"><Search size={17}/><input className="input" placeholder="Search customer, phone or NRC..." value={q} onChange={e=>setQ(e.target.value)}/></div></div><div className="table-wrap"><table><thead><tr><th>Customer ID</th><th>Name</th><th>Phone</th><th>NRC / TPIN</th><th>Address</th></tr></thead><tbody>{filtered.map(x=><tr key={x.id}><td><strong>{x.customerId}</strong></td><td>{x.name}</td><td>{x.phone}</td><td>{x.nrcOrTpin}</td><td>{x.address}</td></tr>)}</tbody></table>{!filtered.length&&<div className="empty"><Users size={34}/><p>No customers found.</p></div>}</div></div></div></>;
+}
