@@ -3,5 +3,6 @@ export type VehicleStatus="Awaiting Collection"|"In Transit"|"Available"|"Reserv
 export type Vehicle={
  id:string;stockId:string;vin:string;engineNumber:string;registrationNumber?:string;make:string;model:string;year:number;colour:string;
  purchasePrice:number;purchaseCurrency?:Currency;totalCost:number;
+ purchaseExchangeRate?:number;originalPurchasePrice?:number;purchasePriceZmw?:number;
  currentLocation:string;status:VehicleStatus;supplier:string;purchaseDate:string;createdAt:string;
 };
