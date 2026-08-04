@@ -9,13 +9,13 @@ const groups=[
  {id:"sales",label:"Sales & Customers",icon:ShoppingCart,items:[["/sales","Sales",ShoppingCart],["/customers","Customers",ContactRound]]},
  {id:"operations",label:"Operations",icon:Route,items:[["/trips","Collection Trips",Route],["/drivers","Drivers",Users],["/expenses","Expenses",Receipt]]},
  {id:"finance",label:"Finance & Compliance",icon:Landmark,items:[["/finance","Finance",Landmark],["/cost-analysis","Cost Analysis",ChartNoAxesCombined],["/tax","Tax Centre",FileCheck2],["/reports","Reports",FileBarChart]]},
- {id:"admin",label:"Administration",icon:Settings,items:[["#","Settings",Settings]]}
+ {id:"admin",label:"Administration",icon:Settings,items:[["/settings","Settings",Settings]]}
 ] as const;
 
 export function Sidebar(){
  const pathname=usePathname();
  const [mobileOpen,setMobileOpen]=useState(false);
- const active=(href:string)=>href!=="#"&&(pathname===href||(href!=="/"&&pathname.startsWith(`${href}/`)));
+ const active=(href:string)=>pathname===href||(href!=="/"&&pathname.startsWith(`${href}/`));
  const activeGroup=groups.find(group=>group.items.some(([href])=>active(href)))?.id;
  const [openGroups,setOpenGroups]=useState<Record<string,boolean>>(()=>Object.fromEntries(groups.map(g=>[g.id,g.id===activeGroup||g.id==="vehicles"])));
  useEffect(()=>{if(activeGroup)setOpenGroups(current=>({...current,[activeGroup]:true}));setMobileOpen(false)},[pathname,activeGroup]);
