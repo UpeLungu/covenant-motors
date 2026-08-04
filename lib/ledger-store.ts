@@ -1,6 +1,6 @@
 "use client";
 export type VehicleExpense={id:string;vehicleId:string;category:string;description:string;amount:number;date:string;reference?:string;createdAt:string};
-export type VehicleDocument={id:string;vehicleId:string;type:string;name:string;reference?:string;date:string;createdAt:string};
+export type VehicleDocument={id:string;vehicleId:string;type:string;name:string;reference?:string;date:string;createdAt:string;fileName?:string;fileType?:string;fileSize?:number;fileData?:string};
 const EXPENSE_KEY="covenant-motors-vehicle-expenses";
 const DOCUMENT_KEY="covenant-motors-vehicle-documents";
 const demoExpenses:VehicleExpense[]=[
