@@ -7,7 +7,7 @@ import {Vehicle} from "@/lib/types";
 import {loadTrips,tripSpent,CollectionTrip} from "@/lib/operations-store";
 import {loadSales,Sale} from "@/lib/sales-store";
 import {loadVehicleDocuments,loadVehicleExpenses,VehicleDocument,VehicleExpense} from "@/lib/ledger-store";
-import {formatCurrency,groupCurrencyAmounts,normalizeCurrency} from "@/lib/currency";
+import {Currency,formatCurrency,groupCurrencyAmounts,normalizeCurrency} from "@/lib/currency";
 
 const money=(n:number)=>formatCurrency(n,"ZMW");
 const badge=(status:string)=>status==="Available"?"available":status==="In Transit"?"transit":status==="Sold"?"sold":"awaiting";
@@ -23,7 +23,9 @@ export default function Dashboard(){
   const repair=vehicles.filter(v=>v.status==="Under Repair").length;
   const sold=vehicles.filter(v=>v.status==="Sold").length;
   const stock=groupCurrencyAmounts(unsold,v=>v.totalCost,v=>v.purchaseCurrency);
+  const stockCount={ZMW:unsold.filter(v=>normalizeCurrency(v.purchaseCurrency)==="ZMW").length,USD:unsold.filter(v=>normalizeCurrency(v.purchaseCurrency)==="USD").length};
   const revenue=groupCurrencyAmounts(sales,s=>s.sellingPrice,s=>s.currency);
+  const salesCount={ZMW:sales.filter(s=>normalizeCurrency(s.currency)==="ZMW").length,USD:sales.filter(s=>normalizeCurrency(s.currency)==="USD").length};
   const received=groupCurrencyAmounts(sales,s=>s.amountPaid,s=>s.currency);
   const outstanding=groupCurrencyAmounts(sales,s=>s.balance,s=>s.currency);
   const comparableSales=sales.filter(s=>!s.mixedCurrency);
@@ -32,7 +34,7 @@ export default function Dashboard(){
   const activeTrips=trips.filter(t=>t.status!=="Reconciled").length;
   const unreconciled=trips.filter(t=>t.status!=="Reconciled").reduce((s,t)=>s+Math.abs(t.advance-tripSpent(t)),0);
   const missingDocs=vehicles.filter(v=>!documents.some(d=>d.vehicleId===v.id&&d.type==="Purchase Invoice")).length;
-  return {available,transit,awaiting,repair,sold,stock,revenue,received,outstanding,profit,mixedProfit,activeTrips,unreconciled,missingDocs,total:vehicles.length};
+  return {available,transit,awaiting,repair,sold,stock,stockCount,revenue,salesCount,received,outstanding,profit,mixedProfit,activeTrips,unreconciled,missingDocs,total:vehicles.length};
  },[vehicles,trips,sales,documents]);
  const activity=useMemo(()=>{
   const rows=[
@@ -44,14 +46,20 @@ export default function Dashboard(){
   return rows.sort((a,b)=>new Date(b.date).getTime()-new Date(a.date).getTime()).slice(0,7);
  },[vehicles,expenses,trips,sales]);
  const maxStatus=Math.max(1,stats.total);
- const CurrencyKpi=({title,values,icon}:{title:string;values:{ZMW:number;USD:number};icon:React.ReactNode})=><div className="kpi-card"><div><span>{title}</span><strong>{formatCurrency(values.ZMW,"ZMW")}</strong><small>{formatCurrency(values.USD,"USD")}</small></div>{icon}</div>;
+ const CurrencyCard=({title,amount,currency,note,icon}:{title:string;amount:number;currency:Currency;note:string;icon:React.ReactNode})=><div className={`kpi-card currency-card ${currency.toLowerCase()}-card`}><div><span>{title}</span><strong>{formatCurrency(amount,currency)}</strong><small>{note}</small></div>{icon}</div>;
  return <>
   <div className="dashboard-hero"><div><span className="eyebrow">DEALERSHIP CONTROL CENTRE</span><h1>Covenant Motors Dashboard</h1><p>Live visibility across inventory, collection trips, sales, costs and outstanding actions.</p></div><div className="quick-actions"><Link className="button" href="/vehicles/new"><Plus size={17}/>Add Vehicle</Link><Link className="button secondary" href="/trips"><Route size={17}/>Assign Trip</Link><Link className="button secondary" href="/sales"><ShoppingCart size={17}/>Record Sale</Link></div></div>
-  <div className="dashboard-kpis">
-   <CurrencyKpi title="Unsold Stock Value" values={stats.stock} icon={<Wallet/>}/>
-   <CurrencyKpi title="Sales Revenue" values={stats.revenue} icon={<ShoppingCart/>}/>
-   <CurrencyKpi title="Outstanding Balances" values={stats.outstanding} icon={<Receipt/>}/>
-   <CurrencyKpi title="Comparable Gross Profit" values={stats.profit} icon={<TrendingUp/>}/>
+  <div className="dashboard-kpis currency-dashboard-kpis">
+   <CurrencyCard title="Stock Value — Kwacha" amount={stats.stock.ZMW} currency="ZMW" note={`${stats.stockCount.ZMW} unsold ZMW vehicle(s)`} icon={<Wallet/>}/>
+   <CurrencyCard title="Stock Value — Dollar" amount={stats.stock.USD} currency="USD" note={`${stats.stockCount.USD} unsold USD vehicle(s)`} icon={<Wallet/>}/>
+   <CurrencyCard title="Sales — Kwacha" amount={stats.revenue.ZMW} currency="ZMW" note={`${stats.salesCount.ZMW} ZMW sale(s)`} icon={<ShoppingCart/>}/>
+   <CurrencyCard title="Sales — Dollar" amount={stats.revenue.USD} currency="USD" note={`${stats.salesCount.USD} USD sale(s)`} icon={<ShoppingCart/>}/>
+  </div>
+  <div className="dashboard-kpis secondary-currency-kpis">
+   <CurrencyCard title="Outstanding — Kwacha" amount={stats.outstanding.ZMW} currency="ZMW" note={`${formatCurrency(stats.received.ZMW,"ZMW")} received`} icon={<Receipt/>}/>
+   <CurrencyCard title="Outstanding — Dollar" amount={stats.outstanding.USD} currency="USD" note={`${formatCurrency(stats.received.USD,"USD")} received`} icon={<Receipt/>}/>
+   <CurrencyCard title="Gross Profit — Kwacha" amount={stats.profit.ZMW} currency="ZMW" note="Comparable ZMW transactions" icon={<TrendingUp/>}/>
+   <CurrencyCard title="Gross Profit — Dollar" amount={stats.profit.USD} currency="USD" note="Comparable USD transactions" icon={<TrendingUp/>}/>
   </div>
   {stats.mixedProfit>0&&<div className="summary-item section-gap"><span>Mixed-currency profit review</span><strong>{stats.mixedProfit} sale(s) require manual profit analysis because purchase and sale currencies differ.</strong></div>}
   <div className="status-strip">
@@ -67,7 +75,7 @@ export default function Dashboard(){
    </div></section>
   </div>
   <div className="dashboard-grid lower-grid">
-   <section className="panel"><div className="panel-head"><h2>Recent Vehicles</h2><Link href="/vehicles">View all <ArrowRight size={15}/></Link></div><div className="table-wrap"><table><thead><tr><th>Stock ID</th><th>Vehicle</th><th>Status</th><th>Cost</th><th>Currency</th></tr></thead><tbody>{vehicles.slice().sort((a,b)=>new Date(b.createdAt).getTime()-new Date(a.createdAt).getTime()).slice(0,6).map(v=><tr key={v.id}><td><Link href={`/vehicles/${v.id}`}><b>{v.stockId}</b></Link></td><td>{v.make} {v.model} {v.year}</td><td><span className={`badge ${badge(v.status)}`}>{v.status}</span></td><td><b>{formatCurrency(v.totalCost,normalizeCurrency(v.purchaseCurrency))}</b></td><td>{normalizeCurrency(v.purchaseCurrency)}</td></tr>)}</tbody></table>{!vehicles.length&&<div className="empty">No vehicles registered.</div>}</div></section>
+   <section className="panel"><div className="panel-head"><h2>Recent Vehicles</h2><Link href="/vehicles">View all <ArrowRight size={15}/></Link></div><div className="table-wrap"><table><thead><tr><th>Stock ID</th><th>Vehicle</th><th>Status</th><th>Cost</th><th>Currency</th></tr></thead><tbody>{vehicles.slice().sort((a,b)=>new Date(b.createdAt).getTime()-new Date(a.createdAt).getTime()).slice(0,6).map(v=><tr key={v.id}><td><Link href={`/vehicles/${v.id}`}><b>{v.stockId}</b></Link></td><td>{v.make} {v.model} {v.year}</td><td><span className={`badge ${badge(v.status)}`}>{v.status}</span></td><td><b>{formatCurrency(v.totalCost,normalizeCurrency(v.purchaseCurrency))}</b></td><td><b>{normalizeCurrency(v.purchaseCurrency)}</b></td></tr>)}</tbody></table>{!vehicles.length&&<div className="empty">No vehicles registered.</div>}</div></section>
    <section className="panel"><div className="panel-head"><h2>Recent Activity</h2></div><div className="activity-list">{activity.map((x,i)=><div key={`${x.date}-${i}`}><div className={`activity-dot ${x.kind}`}/><span><b>{x.title}</b><small>{x.detail}</small></span><time>{new Date(x.date).toLocaleDateString("en-ZM",{day:"2-digit",month:"short"})}</time></div>)}{!activity.length&&<div className="empty">No recent activity.</div>}</div></section>
   </div>
  </>;
