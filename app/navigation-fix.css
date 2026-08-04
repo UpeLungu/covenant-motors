@@ -1,0 +1,5 @@
+.nav-section-items{display:block!important;max-height:0;overflow:hidden;opacity:0;transform:translateY(-4px);transition:max-height .24s ease,opacity .18s ease,transform .18s ease}
+.nav-section.open .nav-section-items{max-height:320px;opacity:1;transform:translateY(0)}
+.nav-section-items:before{display:none!important}
+.nav-section-items a{overflow:visible!important}
+@media (prefers-reduced-motion:reduce){.nav-section-items{transition:none}}
