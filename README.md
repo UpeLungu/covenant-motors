@@ -12,6 +12,8 @@ Mobile-first dealership management web application built with Next.js, TypeScrip
 - Finance and accounting
 - Tax Centre
 - Reports and CSV/print exports
+- Net profit/loss cost analysis
+- Professional UI consolidation in progress
 - Supabase-ready architecture
 
 ## Run locally
@@ -23,4 +25,4 @@ npm run dev
 ## Deployment
 Import this repository into Vercel. Framework preset: Next.js. No environment variables are required for the current demo build.
 
-Deployment trigger refreshed on 3 August 2026 at 22:18 CAT.
+Deployment trigger refreshed on 4 August 2026 after Pro upgrade.
