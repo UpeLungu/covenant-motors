@@ -1,6 +1,6 @@
 "use client";
 import type {Currency} from "./currency";
-export type VehicleExpense={id:string;vehicleId:string;category:string;description:string;amount:number;currency?:Currency;date:string;reference?:string;createdAt:string};
+export type VehicleExpense={id:string;vehicleId:string;category:string;description:string;amount:number;currency?:Currency;exchangeRate?:number;originalAmount?:number;amountZmw?:number;date:string;reference?:string;createdAt:string};
 export type VehicleDocument={id:string;vehicleId:string;type:string;name:string;reference?:string;date:string;createdAt:string;fileName?:string;fileType?:string;fileSize?:number;fileData?:string};
 const EXPENSE_KEY="covenant-motors-vehicle-expenses";const DOCUMENT_KEY="covenant-motors-vehicle-documents";
 const demoExpenses:VehicleExpense[]=[{id:"ve1",vehicleId:"1",category:"Clearing",description:"Clearing and handling charges",amount:4200,currency:"ZMW",date:"2026-07-11",reference:"CLR-001",createdAt:"2026-07-11T10:00:00Z"},{id:"ve2",vehicleId:"1",category:"Registration",description:"Registration and road tax",amount:1800,currency:"ZMW",date:"2026-07-13",reference:"REG-001",createdAt:"2026-07-13T09:00:00Z"},{id:"ve3",vehicleId:"1",category:"Repairs",description:"Initial service and minor repairs",amount:2500,currency:"ZMW",date:"2026-07-14",reference:"REP-001",createdAt:"2026-07-14T14:00:00Z"}];
