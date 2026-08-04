@@ -1,3 +1,4 @@
+import type {Currency} from "./currency";
 export type VehicleStatus = "Awaiting Collection" | "In Transit" | "Available" | "Reserved" | "Sold" | "Under Repair";
 export type Vehicle = {
   id: string;
@@ -10,6 +11,9 @@ export type Vehicle = {
   year: number;
   colour: string;
   purchasePrice: number;
+  purchaseCurrency?: Currency;
+  purchaseExchangeRate?: number;
+  purchasePriceZmw?: number;
   totalCost: number;
   currentLocation: string;
   status: VehicleStatus;
