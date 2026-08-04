@@ -1,0 +1,27 @@
+/* Functional interaction regression fixes */
+button,a,input,select,textarea,[role="button"]{pointer-events:auto;touch-action:manipulation}
+button,.button,.row-action,.icon-button,.nav-section-trigger{position:relative;z-index:1}
+button:disabled,.button:disabled{cursor:not-allowed;opacity:.55;pointer-events:none}
+
+/* Sticky form footers were overlapping controls on shorter screens. */
+.actions{position:static!important;bottom:auto!important;z-index:auto!important;background:transparent!important}
+
+/* Make inline editors unmistakable and reachable. */
+.valuation-editor{position:fixed!important;z-index:150!important;left:50%;top:50%;transform:translate(-50%,-50%);width:min(92vw,680px);max-height:88dvh;overflow:auto;margin:0!important;box-shadow:0 32px 100px rgba(2,6,23,.38)!important}
+body:has(.valuation-editor)::before{content:"";position:fixed;z-index:140;inset:0;background:rgba(2,6,23,.58);backdrop-filter:blur(3px)}
+
+/* Ensure tab and quick-action controls stay above decorative layers. */
+.deal-tabs{isolation:isolate}
+.deal-tabs button,.trip-actions button,.document-actions a,.document-actions button,.mobile-card-actions>*{min-height:40px;cursor:pointer}
+
+/* Stop decorative elements from intercepting taps. */
+.metric-icon,.vehicle-thumb,.document-icon,.activity-dot,.timeline-dot,.nav-child-line{pointer-events:none}
+
+/* Better feedback for real button presses. */
+button:not(:disabled):active,.button:not(:disabled):active,.row-action:active{transform:translateY(1px) scale(.99)}
+
+@media(max-width:760px){
+ .valuation-editor{top:auto;bottom:0;left:0;transform:none;width:100%;max-height:88dvh;border-radius:20px 20px 0 0!important;padding-bottom:max(18px,env(safe-area-inset-bottom))}
+ .row-actions,.mobile-card-actions,.trip-actions,.document-actions{position:relative;z-index:2}
+ .button,.row-action,.icon-button,.nav-section-trigger{min-height:44px}
+}
