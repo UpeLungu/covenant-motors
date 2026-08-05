@@ -22,7 +22,7 @@ export function WorkspaceHeader(){
  useEffect(()=>{
   const vehicles=loadVehicles().map(v=>({href:`/vehicles/${v.id}`,title:`${v.stockId} · ${v.make} ${v.model}`,subtitle:`${v.vin} · ${v.supplier} · ${v.currentLocation}`,kind:"Vehicle" as const}));
   const customers=loadCustomers().map(c=>({href:"/customers",title:`${c.customerId} · ${c.name}`,subtitle:`${c.phone} · ${c.nrcOrTpin}`,kind:"Customer" as const}));
-  const drivers=loadDrivers().map(d=>({href:"/drivers",title:`${d.driverId} · ${d.name}`,subtitle:`${d.phone||""} · ${d.licenceNumber||""}`,kind:"Driver" as const}));
+  const drivers=loadDrivers().map(d=>({href:"/drivers",title:`${d.driverId} · ${d.name}`,subtitle:`${d.phone||""} · ${d.licence||""}`,kind:"Driver" as const}));
   const sales=loadSales().map(s=>({href:"/sales",title:`${s.saleId} · ${s.stockId}`,subtitle:`${s.vehicleName} · ${s.customerName}`,kind:"Sale" as const}));
   setRecords([...vehicles,...customers,...drivers,...sales]);
  },[open]);
