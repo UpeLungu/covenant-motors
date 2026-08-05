@@ -1,35 +1,29 @@
 import type {Vehicle} from "./types";
 import type {VehicleExpense} from "./ledger-store";
 import type {Sale} from "./sales-store";
-import {CurrencyTotals,emptyCurrencyTotals,normalizeCurrency} from "./currency";
+import {CurrencyTotals,emptyCurrencyTotals,toZmw} from "./currency";
+
+export function vehicleCostZmw(vehicle:Vehicle,expenses:VehicleExpense[]):number{
+ const purchase=Number(vehicle.purchasePriceZmw??toZmw(Number(vehicle.originalPurchasePrice??vehicle.purchasePrice??0),vehicle.purchaseCurrency||"ZMW",vehicle.purchaseExchangeRate));
+ const localExpenses=expenses.filter(x=>x.vehicleId===vehicle.id).reduce((sum,x)=>sum+Number(x.amount||0),0);
+ return purchase+localExpenses;
+}
 
 export function vehicleCostTotals(vehicle:Vehicle,expenses:VehicleExpense[]):CurrencyTotals{
- const totals=emptyCurrencyTotals();
- totals[normalizeCurrency(vehicle.purchaseCurrency)]+=Number(vehicle.originalPurchasePrice??vehicle.purchasePrice??0);
- expenses.filter(x=>x.vehicleId===vehicle.id).forEach(x=>{totals[normalizeCurrency(x.currency)]+=Number(x.amount||0)});
- return totals;
+ return {ZMW:vehicleCostZmw(vehicle,expenses),USD:0};
 }
 
 export function stockCostTotals(vehicles:Vehicle[],expenses:VehicleExpense[]):CurrencyTotals{
- return vehicles.filter(v=>v.status!=="Sold").reduce((all,v)=>{
-  const cost=vehicleCostTotals(v,expenses);all.ZMW+=cost.ZMW;all.USD+=cost.USD;return all;
- },emptyCurrencyTotals());
+ return {ZMW:vehicles.filter(v=>v.status!=="Sold").reduce((sum,v)=>sum+vehicleCostZmw(v,expenses),0),USD:0};
 }
 
 export function estimatedStockValueTotals(vehicles:Vehicle[]):CurrencyTotals{
- return vehicles.filter(v=>v.status!=="Sold").reduce((all,v)=>{
-  const amount=Number(v.estimatedSellingPrice||0);
-  all[normalizeCurrency(v.estimatedSellingCurrency||v.purchaseCurrency)]+=amount;
-  return all;
- },emptyCurrencyTotals());
+ const ZMW=vehicles.filter(v=>v.status!=="Sold").reduce((sum,v)=>sum+toZmw(Number(v.estimatedSellingPrice||0),v.estimatedSellingCurrency||"ZMW",v.estimatedSellingExchangeRate),0);
+ return {ZMW,USD:0};
 }
 
 export function saleProfitAnalysis(sale:Sale,vehicle:Vehicle|undefined,expenses:VehicleExpense[]){
- const currency=normalizeCurrency(sale.currency);
- if(!vehicle)return {currency,profit:0,mixed:true,cost:0,costs:emptyCurrencyTotals()};
- const costs=vehicleCostTotals(vehicle,expenses);
- const otherCurrency=currency==="ZMW"?"USD":"ZMW";
- const mixed=costs[otherCurrency]!==0;
- const cost=costs[currency];
- return {currency,profit:mixed?0:Number(sale.sellingPrice||0)-cost,mixed,cost,costs};
+ const costs=vehicle?vehicleCostZmw(vehicle,expenses):0;
+ const revenue=Number(sale.sellingPriceZmw??toZmw(Number(sale.originalSellingPrice??sale.sellingPrice||0),sale.currency||"ZMW",sale.exchangeRate));
+ return {currency:"ZMW" as const,profit:revenue-costs,mixed:false,cost:costs,costs:{ZMW:costs,USD:0},revenue};
 }
