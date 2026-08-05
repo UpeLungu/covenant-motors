@@ -2,14 +2,13 @@
 import Link from "next/link";
 import {usePathname} from "next/navigation";
 import {useEffect,useState} from "react";
-import {LayoutDashboard,Car,Users,Route,Receipt,ShoppingCart,FileBarChart,Settings,ContactRound,Landmark,FileCheck2,ChartNoAxesCombined,ChevronDown,Menu,X,Plus} from "lucide-react";
+import {LayoutDashboard,Car,Users,Route,Receipt,ShoppingCart,FileBarChart,ContactRound,Landmark,FileCheck2,ChartNoAxesCombined,ChevronDown,Menu,X,Plus} from "lucide-react";
 
 const groups=[
  {id:"vehicles",label:"Vehicle Management",icon:Car,items:[["/vehicles","Vehicle Stock",Car],["/vehicles/new","Add Vehicle",Plus]]},
  {id:"sales",label:"Sales & Customers",icon:ShoppingCart,items:[["/sales","Sales",ShoppingCart],["/customers","Customers",ContactRound]]},
  {id:"operations",label:"Operations",icon:Route,items:[["/trips","Collection Trips",Route],["/drivers","Drivers",Users],["/expenses","Expenses",Receipt]]},
- {id:"finance",label:"Finance & Compliance",icon:Landmark,items:[["/finance","Finance",Landmark],["/cost-analysis","Cost Analysis",ChartNoAxesCombined],["/tax","Tax Centre",FileCheck2],["/reports","Reports",FileBarChart]]},
- {id:"admin",label:"Administration",icon:Settings,items:[["/settings","Settings",Settings]]}
+ {id:"finance",label:"Finance & Compliance",icon:Landmark,items:[["/finance","Finance",Landmark],["/cost-analysis","Cost Analysis",ChartNoAxesCombined],["/tax","Tax Centre",FileCheck2],["/reports","Reports",FileBarChart]]}
 ] as const;
 
 export function Sidebar(){
