@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test:accounting": "node scripts/accounting-regression.mjs"
+    "test:accounting": "node scripts/accounting-regression.mjs",
+    "test:finance": "node scripts/finance-posting-regression.mjs",
+    "test:regression": "npm run test:accounting && npm run test:finance"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
