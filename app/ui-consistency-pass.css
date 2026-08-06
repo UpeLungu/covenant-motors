@@ -1,0 +1,161 @@
+/* Covenant Motors UI consistency pass — preserves the existing colour system. */
+
+.deal-tabs{
+  position:relative;
+  display:flex;
+  align-items:stretch;
+  gap:4px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  margin:0 0 20px;
+  padding:0 8px;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:14px;
+  box-shadow:0 5px 18px rgba(15,23,42,.045);
+  scrollbar-width:thin;
+}
+
+.deal-tabs button{
+  position:relative;
+  flex:0 0 auto;
+  min-height:52px;
+  padding:0 14px;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  color:#64748b;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  font-size:13px;
+  font-weight:700;
+  line-height:1;
+  white-space:nowrap;
+  cursor:pointer;
+  transition:color .16s ease,background-color .16s ease;
+}
+
+.deal-tabs button::after{
+  content:"";
+  position:absolute;
+  left:12px;
+  right:12px;
+  bottom:0;
+  height:3px;
+  border-radius:3px 3px 0 0;
+  background:transparent;
+  transform:scaleX(.45);
+  transition:background-color .16s ease,transform .16s ease;
+}
+
+.deal-tabs button:hover{
+  color:var(--brand);
+  background:#f8fafc;
+}
+
+.deal-tabs button.active{
+  color:var(--brand);
+  background:transparent;
+  border-color:transparent;
+}
+
+.deal-tabs button.active::after{
+  background:var(--brand);
+  transform:scaleX(1);
+}
+
+.deal-tabs button svg{
+  flex:0 0 auto;
+  opacity:.86;
+}
+
+.deal-tabs button.active svg{
+  opacity:1;
+}
+
+.deal-tabs button:focus{
+  outline:none;
+}
+
+.deal-tabs button:focus-visible{
+  z-index:1;
+  outline:2px solid rgba(15,118,110,.42);
+  outline-offset:-4px;
+  border-radius:8px;
+}
+
+/* Deal Jacket spacing and section hierarchy. */
+.deal-hero{
+  margin-bottom:14px;
+}
+
+.deal-kpis{
+  margin-bottom:14px;
+}
+
+.deal-kpis>div{
+  min-height:108px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.deal-kpis span{
+  font-weight:650;
+}
+
+.deal-grid>.panel,
+.deal-grid>aside.panel{
+  height:100%;
+}
+
+.section-actions{
+  min-height:52px;
+  padding:0 2px;
+}
+
+.section-actions h2,
+.panel-head h2{
+  letter-spacing:-.01em;
+}
+
+.ledger-row,
+.ledger-total,
+.ledger-sale,
+.ledger-profit,
+.ledger-loss{
+  min-height:58px;
+}
+
+.document-card{
+  min-height:104px;
+  align-items:flex-start;
+}
+
+.health-list>div:last-child,
+.expense-list>div:last-child{
+  border-bottom:0;
+}
+
+@media(max-width:760px){
+  .deal-tabs{
+    margin-left:-2px;
+    margin-right:-2px;
+    padding:0 4px;
+    border-radius:12px;
+  }
+  .deal-tabs button{
+    min-height:48px;
+    padding:0 12px;
+    font-size:12px;
+  }
+  .deal-tabs button::after{
+    left:10px;
+    right:10px;
+  }
+  .deal-kpis>div{
+    min-height:96px;
+  }
+}
