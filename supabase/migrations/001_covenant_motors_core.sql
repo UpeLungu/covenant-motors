@@ -98,8 +98,12 @@ begin
     when 'driver' then 'DRV'
     when 'trip' then 'TRP'
     when 'quotation' then 'QUO'
-    else raise_exception('Unsupported reference entity: %s', p_entity)
+    else null
   end;
+
+  if v_prefix is null then
+    raise exception 'Unsupported reference entity: %', p_entity;
+  end if;
 
   insert into public.id_counters (business_id,entity,counter_year,last_number)
   values (p_business_id,p_entity,p_year,1)
@@ -585,7 +589,6 @@ alter table public.tax_settings enable row level security;
 alter table public.tax_returns enable row level security;
 alter table public.audit_logs enable row level security;
 
--- Business users can access rows belonging to their assigned business.
 create policy "business members read business" on public.businesses
 for select to authenticated using (id = public.current_business_id());
 
@@ -594,7 +597,6 @@ for select to authenticated using (business_id = public.current_business_id());
 create policy "users update own profile" on public.profiles
 for update to authenticated using (id = auth.uid()) with check (id = auth.uid() and business_id = public.current_business_id());
 
--- Apply common business-member CRUD policies to operational tables.
 do $$
 declare t text;
 begin
