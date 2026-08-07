@@ -19,6 +19,7 @@ import "./sales-customers-consistency.css";
 import "./global-responsive-consistency.css";
 import "./dialogs.css";
 import "./expenses-final.css";
+import "./finance-final-pass.css";
 import { AppShell } from "@/components/app-shell";
 export const metadata={title:"Covenant Motors",description:"Dealership management web application"};
 export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="en"><body><AppShell>{children}</AppShell></body></html>}
